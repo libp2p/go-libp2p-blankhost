@@ -4,14 +4,14 @@ import (
 	"context"
 	"io"
 
-	logging "gx/ipfs/QmSpJByNKFX1sCsHBEp3R73FL4NF6FnQTEGyNAXHm2GS52/go-log"
-	inet "gx/ipfs/QmU3pGGVT1riXp5dBJbNrGpxssVScfvk9236drRHZZbKJ1/go-libp2p-net"
-	ma "gx/ipfs/QmUAQaWbKxGCUTuoQVvvicbQNZ9APF5pDGWyAZSe93AtKH/go-multiaddr"
-	pstore "gx/ipfs/QmXXCcQ7CLg5a81Ui9TTR35QcR4y7ZyihxwfjqaHfUVcVo/go-libp2p-peerstore"
-	protocol "gx/ipfs/QmZNkThpqfVXs9GNbexPrfBbXSLNYeKrE7jwFM2oqHbyqN/go-libp2p-protocol"
-	mstream "gx/ipfs/QmatJnBK2qyjcy1AYq4Gb5YH16YM7uibdteQ589r46YLvB/go-multistream"
-	host "gx/ipfs/Qmb6UFbVu1grhv5o5KnouvtZ6cqdrjXj6zLejAHWunxgCt/go-libp2p-host"
-	peer "gx/ipfs/QmfMmLGoKzCHDN7cGgk64PJr4iipzidDRME8HABSJqvmhC/go-libp2p-peer"
+	logging "github.com/ipfs/go-log"
+	host "github.com/libp2p/go-libp2p-host"
+	inet "github.com/libp2p/go-libp2p-net"
+	peer "github.com/libp2p/go-libp2p-peer"
+	pstore "github.com/libp2p/go-libp2p-peerstore"
+	protocol "github.com/libp2p/go-libp2p-protocol"
+	ma "github.com/multiformats/go-multiaddr"
+	mstream "github.com/whyrusleeping/go-multistream"
 )
 
 var log = logging.Logger("blankhost")
