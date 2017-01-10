@@ -80,7 +80,6 @@ func (bh *BlankHost) NewStream(ctx context.Context, p peer.ID, protos ...protoco
 		protoStrs = append(protoStrs, string(pid))
 	}
 
-	log.Error("select: ", protoStrs)
 	selected, err := mstream.SelectOneOf(protoStrs, s)
 	if err != nil {
 		s.Close()
