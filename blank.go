@@ -5,6 +5,7 @@ import (
 	"io"
 
 	logging "github.com/ipfs/go-log"
+	connmgr "github.com/libp2p/go-libp2p-connmgr"
 	host "github.com/libp2p/go-libp2p-host"
 	inet "github.com/libp2p/go-libp2p-net"
 	peer "github.com/libp2p/go-libp2p-peer"
@@ -18,14 +19,16 @@ var log = logging.Logger("blankhost")
 
 // BlankHost is the thinnest implementation of the host.Host interface
 type BlankHost struct {
-	n   inet.Network
-	mux *mstream.MultistreamMuxer
+	n    inet.Network
+	mux  *mstream.MultistreamMuxer
+	cmgr connmgr.ConnManager
 }
 
 func NewBlankHost(n inet.Network) *BlankHost {
 	bh := &BlankHost{
-		n:   n,
-		mux: mstream.NewMultistreamMuxer(),
+		n:    n,
+		cmgr: connmgr.NewConnManager(0, 0, 0),
+		mux:  mstream.NewMultistreamMuxer(),
 	}
 
 	n.SetStreamHandler(bh.newStreamHandler)
@@ -138,4 +141,8 @@ func (bh *BlankHost) Mux() *mstream.MultistreamMuxer {
 // TODO: also not sure this fits... Might be better ways around this (leaky abstractions)
 func (bh *BlankHost) Network() inet.Network {
 	return bh.n
+}
+
+func (bh *BlankHost) ConnManager() connmgr.ConnManager {
+	return bh.cmgr
 }
