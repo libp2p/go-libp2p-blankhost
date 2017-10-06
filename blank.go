@@ -5,8 +5,8 @@ import (
 	"io"
 
 	logging "github.com/ipfs/go-log"
-	connmgr "github.com/libp2p/go-libp2p-connmgr"
 	host "github.com/libp2p/go-libp2p-host"
+	ifconnmgr "github.com/libp2p/go-libp2p-interface-connmgr"
 	inet "github.com/libp2p/go-libp2p-net"
 	peer "github.com/libp2p/go-libp2p-peer"
 	pstore "github.com/libp2p/go-libp2p-peerstore"
@@ -21,13 +21,13 @@ var log = logging.Logger("blankhost")
 type BlankHost struct {
 	n    inet.Network
 	mux  *mstream.MultistreamMuxer
-	cmgr connmgr.ConnManager
+	cmgr ifconnmgr.ConnManager
 }
 
 func NewBlankHost(n inet.Network) *BlankHost {
 	bh := &BlankHost{
 		n:    n,
-		cmgr: connmgr.NewConnManager(0, 0, 0),
+		cmgr: &ifconnmgr.NullConnMgr{},
 		mux:  mstream.NewMultistreamMuxer(),
 	}
 
@@ -143,6 +143,6 @@ func (bh *BlankHost) Network() inet.Network {
 	return bh.n
 }
 
-func (bh *BlankHost) ConnManager() connmgr.ConnManager {
+func (bh *BlankHost) ConnManager() ifconnmgr.ConnManager {
 	return bh.cmgr
 }
