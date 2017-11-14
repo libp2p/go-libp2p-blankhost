@@ -9,15 +9,15 @@
   "gxDependencies": [
     {
       "author": "whyrusleeping",
-      "hash": "Qmc1XhrFEiSeBNn3mpfg6gEuYCt5im2gYmNVmncsvmpeAk",
+      "hash": "QmRS46AyqtpJBsf1zmQdeizSDEzo1qkWR7rdEuPFAv8237",
       "name": "go-libp2p-host",
-      "version": "2.1.1"
+      "version": "2.1.2"
     },
     {
       "author": "whyrusleeping",
-      "hash": "QmNa31VPzC561NWwRsJLE7nGYZYuuD2QfpK2b1q9BK54J1",
+      "hash": "QmbD5yKbXahNvoMqzeuNyKQA9vAs9fUvJg2GXeWU1fVqY5",
       "name": "go-libp2p-net",
-      "version": "2.0.0"
+      "version": "2.0.2"
     },
     {
       "author": "whyrusleeping",
@@ -60,6 +60,6 @@
   "license": "",
   "name": "go-libp2p-blankhost",
   "releaseCmd": "git commit -a -m \"gx publish $VERSION\"",
-  "version": "0.2.1"
+  "version": "0.2.2"
 }
 
