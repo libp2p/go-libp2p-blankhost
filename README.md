@@ -34,3 +34,7 @@ Small note: If editing the Readme, please conform to the [standard-readme](https
 ## License
 
 MIT © Jeromy Johnson
+
+---
+
+The last gx published version of this module was: 0.3.26: QmcBTHN7uAMBdkzRoQ3n9cE7tGu8Ubd9zmahjskjTRw4Uf
