@@ -11,6 +11,7 @@ import (
 	peer "github.com/libp2p/go-libp2p-peer"
 	pstore "github.com/libp2p/go-libp2p-peerstore"
 	protocol "github.com/libp2p/go-libp2p-protocol"
+	protocol2 "github.com/libp2p/go-libp2p/skel/protocol"
 	ma "github.com/multiformats/go-multiaddr"
 	mstream "github.com/multiformats/go-multistream"
 )
@@ -134,7 +135,7 @@ func (h *BlankHost) newStreamHandler(s inet.Stream) {
 }
 
 // TODO: i'm not sure this really needs to be here
-func (bh *BlankHost) Mux() *mstream.MultistreamMuxer {
+func (bh *BlankHost) Mux() protocol2.Switch {
 	return bh.mux
 }
 
