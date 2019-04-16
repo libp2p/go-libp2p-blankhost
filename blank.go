@@ -5,13 +5,13 @@ import (
 	"io"
 
 	logging "github.com/ipfs/go-log"
+	protocol2 "github.com/libp2p/go-libp2p-core/protocol"
 	host "github.com/libp2p/go-libp2p-host"
 	ifconnmgr "github.com/libp2p/go-libp2p-interface-connmgr"
 	inet "github.com/libp2p/go-libp2p-net"
 	peer "github.com/libp2p/go-libp2p-peer"
 	pstore "github.com/libp2p/go-libp2p-peerstore"
 	protocol "github.com/libp2p/go-libp2p-protocol"
-	protocol2 "github.com/libp2p/go-libp2p/skel/protocol"
 	ma "github.com/multiformats/go-multiaddr"
 	mstream "github.com/multiformats/go-multistream"
 )
