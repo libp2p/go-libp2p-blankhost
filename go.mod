@@ -12,5 +12,3 @@ require (
 	github.com/multiformats/go-multiaddr v0.0.2
 	github.com/multiformats/go-multistream v0.0.2-0.20190412183203-c185a18a95c8
 )
-
-go 1.11
