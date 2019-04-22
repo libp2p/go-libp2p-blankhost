@@ -2,7 +2,8 @@ module github.com/libp2p/go-libp2p-blankhost
 
 require (
 	github.com/ipfs/go-log v0.0.1
-	github.com/libp2p/go-libp2p-core v0.0.0-20190417162149-f41b5dd7c01b
+	github.com/libp2p/go-libp2p-core v0.0.0-20190422125857-3a54eb68d178
+	github.com/libp2p/go-libp2p-crypto v0.0.2-0.20190422130203-0dad27f616de // indirect
 	github.com/libp2p/go-libp2p-host v0.0.3-0.20190417163130-3dbb8ff97068
 	github.com/libp2p/go-libp2p-interface-connmgr v0.0.4-0.20190417163148-042f06a9d500
 	github.com/libp2p/go-libp2p-net v0.0.3-0.20190417163222-435e3f738c44
