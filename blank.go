@@ -5,12 +5,11 @@ import (
 	"io"
 
 	logging "github.com/ipfs/go-log"
-	host "github.com/libp2p/go-libp2p-host"
-	ifconnmgr "github.com/libp2p/go-libp2p-interface-connmgr"
-	inet "github.com/libp2p/go-libp2p-net"
-	peer "github.com/libp2p/go-libp2p-peer"
-	pstore "github.com/libp2p/go-libp2p-peerstore"
-	protocol "github.com/libp2p/go-libp2p-protocol"
+	core "github.com/libp2p/go-libp2p-core"
+	connmgr "github.com/libp2p/go-libp2p-core/connmgr"
+	network "github.com/libp2p/go-libp2p-core/network"
+	pstore "github.com/libp2p/go-libp2p-core/peerstore"
+	protocol "github.com/libp2p/go-libp2p-core/protocol"
 	ma "github.com/multiformats/go-multiaddr"
 	mstream "github.com/multiformats/go-multistream"
 )
@@ -19,15 +18,15 @@ var log = logging.Logger("blankhost")
 
 // BlankHost is the thinnest implementation of the host.Host interface
 type BlankHost struct {
-	n    inet.Network
+	n    core.Network
 	mux  *mstream.MultistreamMuxer
-	cmgr ifconnmgr.ConnManager
+	cmgr connmgr.ConnManager
 }
 
-func NewBlankHost(n inet.Network) *BlankHost {
+func NewBlankHost(n core.Network) *BlankHost {
 	bh := &BlankHost{
 		n:    n,
-		cmgr: &ifconnmgr.NullConnMgr{},
+		cmgr: &connmgr.NullConnMgr{},
 		mux:  mstream.NewMultistreamMuxer(),
 	}
 
@@ -35,7 +34,7 @@ func NewBlankHost(n inet.Network) *BlankHost {
 	return bh
 }
 
-var _ host.Host = (*BlankHost)(nil)
+var _ core.Host = (*BlankHost)(nil)
 
 func (bh *BlankHost) Addrs() []ma.Multiaddr {
 	addrs, err := bh.n.InterfaceListenAddresses()
@@ -51,7 +50,7 @@ func (bh *BlankHost) Close() error {
 	return bh.n.Close()
 }
 
-func (bh *BlankHost) Connect(ctx context.Context, pi pstore.PeerInfo) error {
+func (bh *BlankHost) Connect(ctx context.Context, pi core.PeerAddrInfo) error {
 	// absorb addresses into peerstore
 	bh.Peerstore().AddAddrs(pi.ID, pi.Addrs, pstore.TempAddrTTL)
 
@@ -68,11 +67,11 @@ func (bh *BlankHost) Peerstore() pstore.Peerstore {
 	return bh.n.Peerstore()
 }
 
-func (bh *BlankHost) ID() peer.ID {
+func (bh *BlankHost) ID() core.PeerID {
 	return bh.n.LocalPeer()
 }
 
-func (bh *BlankHost) NewStream(ctx context.Context, p peer.ID, protos ...protocol.ID) (inet.Stream, error) {
+func (bh *BlankHost) NewStream(ctx context.Context, p core.PeerID, protos ...core.ProtocolID) (core.Stream, error) {
 	s, err := bh.n.NewStream(ctx, p)
 	if err != nil {
 		return nil, err
@@ -96,30 +95,30 @@ func (bh *BlankHost) NewStream(ctx context.Context, p peer.ID, protos ...protoco
 	return s, nil
 }
 
-func (bh *BlankHost) RemoveStreamHandler(p protocol.ID) {
+func (bh *BlankHost) RemoveStreamHandler(p core.ProtocolID) {
 	bh.Mux().RemoveHandler(string(p))
 }
 
-func (bh *BlankHost) SetStreamHandler(pid protocol.ID, handler inet.StreamHandler) {
+func (bh *BlankHost) SetStreamHandler(pid core.ProtocolID, handler network.StreamHandler) {
 	bh.Mux().AddHandler(string(pid), func(p string, rwc io.ReadWriteCloser) error {
-		is := rwc.(inet.Stream)
+		is := rwc.(core.Stream)
 		is.SetProtocol(protocol.ID(p))
 		handler(is)
 		return nil
 	})
 }
 
-func (bh *BlankHost) SetStreamHandlerMatch(pid protocol.ID, m func(string) bool, handler inet.StreamHandler) {
+func (bh *BlankHost) SetStreamHandlerMatch(pid core.ProtocolID, m func(string) bool, handler network.StreamHandler) {
 	bh.Mux().AddHandlerWithFunc(string(pid), m, func(p string, rwc io.ReadWriteCloser) error {
-		is := rwc.(inet.Stream)
+		is := rwc.(core.Stream)
 		is.SetProtocol(protocol.ID(p))
 		handler(is)
 		return nil
 	})
 }
 
-// newStreamHandler is the remote-opened stream handler for inet.Network
-func (h *BlankHost) newStreamHandler(s inet.Stream) {
+// newStreamHandler is the remote-opened stream handler for core.Network
+func (h *BlankHost) newStreamHandler(s core.Stream) {
 
 	protoID, handle, err := h.Mux().Negotiate(s)
 	if err != nil {
@@ -134,15 +133,15 @@ func (h *BlankHost) newStreamHandler(s inet.Stream) {
 }
 
 // TODO: i'm not sure this really needs to be here
-func (bh *BlankHost) Mux() *mstream.MultistreamMuxer {
+func (bh *BlankHost) Mux() protocol.Switch {
 	return bh.mux
 }
 
 // TODO: also not sure this fits... Might be better ways around this (leaky abstractions)
-func (bh *BlankHost) Network() inet.Network {
+func (bh *BlankHost) Network() core.Network {
 	return bh.n
 }
 
-func (bh *BlankHost) ConnManager() ifconnmgr.ConnManager {
+func (bh *BlankHost) ConnManager() connmgr.ConnManager {
 	return bh.cmgr
 }
