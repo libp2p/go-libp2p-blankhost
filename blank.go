@@ -4,12 +4,15 @@ import (
 	"context"
 	"io"
 
+	"github.com/libp2p/go-libp2p-core/connmgr"
+	"github.com/libp2p/go-libp2p-core/host"
+	"github.com/libp2p/go-libp2p-core/network"
+	"github.com/libp2p/go-libp2p-core/peer"
+	"github.com/libp2p/go-libp2p-core/peerstore"
+	"github.com/libp2p/go-libp2p-core/protocol"
+
 	logging "github.com/ipfs/go-log"
-	core "github.com/libp2p/go-libp2p-core"
-	connmgr "github.com/libp2p/go-libp2p-core/connmgr"
-	network "github.com/libp2p/go-libp2p-core/network"
-	pstore "github.com/libp2p/go-libp2p-core/peerstore"
-	protocol "github.com/libp2p/go-libp2p-core/protocol"
+
 	ma "github.com/multiformats/go-multiaddr"
 	mstream "github.com/multiformats/go-multistream"
 )
@@ -18,12 +21,12 @@ var log = logging.Logger("blankhost")
 
 // BlankHost is the thinnest implementation of the host.Host interface
 type BlankHost struct {
-	n    core.Network
+	n    network.Network
 	mux  *mstream.MultistreamMuxer
 	cmgr connmgr.ConnManager
 }
 
-func NewBlankHost(n core.Network) *BlankHost {
+func NewBlankHost(n network.Network) *BlankHost {
 	bh := &BlankHost{
 		n:    n,
 		cmgr: &connmgr.NullConnMgr{},
@@ -34,7 +37,7 @@ func NewBlankHost(n core.Network) *BlankHost {
 	return bh
 }
 
-var _ core.Host = (*BlankHost)(nil)
+var _ host.Host = (*BlankHost)(nil)
 
 func (bh *BlankHost) Addrs() []ma.Multiaddr {
 	addrs, err := bh.n.InterfaceListenAddresses()
@@ -50,28 +53,28 @@ func (bh *BlankHost) Close() error {
 	return bh.n.Close()
 }
 
-func (bh *BlankHost) Connect(ctx context.Context, pi core.PeerAddrInfo) error {
+func (bh *BlankHost) Connect(ctx context.Context, ai peer.AddrInfo) error {
 	// absorb addresses into peerstore
-	bh.Peerstore().AddAddrs(pi.ID, pi.Addrs, pstore.TempAddrTTL)
+	bh.Peerstore().AddAddrs(ai.ID, ai.Addrs, peerstore.TempAddrTTL)
 
-	cs := bh.n.ConnsToPeer(pi.ID)
+	cs := bh.n.ConnsToPeer(ai.ID)
 	if len(cs) > 0 {
 		return nil
 	}
 
-	_, err := bh.Network().DialPeer(ctx, pi.ID)
+	_, err := bh.Network().DialPeer(ctx, ai.ID)
 	return err
 }
 
-func (bh *BlankHost) Peerstore() pstore.Peerstore {
+func (bh *BlankHost) Peerstore() peerstore.Peerstore {
 	return bh.n.Peerstore()
 }
 
-func (bh *BlankHost) ID() core.PeerID {
+func (bh *BlankHost) ID() peer.ID {
 	return bh.n.LocalPeer()
 }
 
-func (bh *BlankHost) NewStream(ctx context.Context, p core.PeerID, protos ...core.ProtocolID) (core.Stream, error) {
+func (bh *BlankHost) NewStream(ctx context.Context, p peer.ID, protos ...protocol.ID) (network.Stream, error) {
 	s, err := bh.n.NewStream(ctx, p)
 	if err != nil {
 		return nil, err
@@ -95,32 +98,32 @@ func (bh *BlankHost) NewStream(ctx context.Context, p core.PeerID, protos ...cor
 	return s, nil
 }
 
-func (bh *BlankHost) RemoveStreamHandler(p core.ProtocolID) {
+func (bh *BlankHost) RemoveStreamHandler(p protocol.ID) {
 	bh.Mux().RemoveHandler(string(p))
 }
 
-func (bh *BlankHost) SetStreamHandler(pid core.ProtocolID, handler network.StreamHandler) {
+func (bh *BlankHost) SetStreamHandler(pid protocol.ID, handler network.StreamHandler) {
 	bh.Mux().AddHandler(string(pid), func(p string, rwc io.ReadWriteCloser) error {
-		is := rwc.(core.Stream)
+		is := rwc.(network.Stream)
 		is.SetProtocol(protocol.ID(p))
 		handler(is)
 		return nil
 	})
 }
 
-func (bh *BlankHost) SetStreamHandlerMatch(pid core.ProtocolID, m func(string) bool, handler network.StreamHandler) {
+func (bh *BlankHost) SetStreamHandlerMatch(pid protocol.ID, m func(string) bool, handler network.StreamHandler) {
 	bh.Mux().AddHandlerWithFunc(string(pid), m, func(p string, rwc io.ReadWriteCloser) error {
-		is := rwc.(core.Stream)
+		is := rwc.(network.Stream)
 		is.SetProtocol(protocol.ID(p))
 		handler(is)
 		return nil
 	})
 }
 
-// newStreamHandler is the remote-opened stream handler for core.Network
-func (h *BlankHost) newStreamHandler(s core.Stream) {
+// newStreamHandler is the remote-opened stream handler for network.Network
+func (bh *BlankHost) newStreamHandler(s network.Stream) {
 
-	protoID, handle, err := h.Mux().Negotiate(s)
+	protoID, handle, err := bh.Mux().Negotiate(s)
 	if err != nil {
 		log.Warning("protocol mux failed: %s", err)
 		s.Close()
@@ -138,7 +141,7 @@ func (bh *BlankHost) Mux() protocol.Switch {
 }
 
 // TODO: also not sure this fits... Might be better ways around this (leaky abstractions)
-func (bh *BlankHost) Network() core.Network {
+func (bh *BlankHost) Network() network.Network {
 	return bh.n
 }
 
