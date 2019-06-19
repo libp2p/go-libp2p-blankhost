@@ -5,11 +5,14 @@ import (
 	"io"
 
 	"github.com/libp2p/go-libp2p-core/connmgr"
+	"github.com/libp2p/go-libp2p-core/event"
 	"github.com/libp2p/go-libp2p-core/host"
 	"github.com/libp2p/go-libp2p-core/network"
 	"github.com/libp2p/go-libp2p-core/peer"
 	"github.com/libp2p/go-libp2p-core/peerstore"
 	"github.com/libp2p/go-libp2p-core/protocol"
+
+	"github.com/libp2p/go-eventbus"
 
 	logging "github.com/ipfs/go-log"
 
@@ -21,16 +24,18 @@ var log = logging.Logger("blankhost")
 
 // BlankHost is the thinnest implementation of the host.Host interface
 type BlankHost struct {
-	n    network.Network
-	mux  *mstream.MultistreamMuxer
-	cmgr connmgr.ConnManager
+	n        network.Network
+	mux      *mstream.MultistreamMuxer
+	cmgr     connmgr.ConnManager
+	eventbus event.Bus
 }
 
 func NewBlankHost(n network.Network) *BlankHost {
 	bh := &BlankHost{
-		n:    n,
-		cmgr: &connmgr.NullConnMgr{},
-		mux:  mstream.NewMultistreamMuxer(),
+		n:        n,
+		cmgr:     &connmgr.NullConnMgr{},
+		mux:      mstream.NewMultistreamMuxer(),
+		eventbus: eventbus.NewBus(),
 	}
 
 	n.SetStreamHandler(bh.newStreamHandler)
@@ -147,4 +152,8 @@ func (bh *BlankHost) Network() network.Network {
 
 func (bh *BlankHost) ConnManager() connmgr.ConnManager {
 	return bh.cmgr
+}
+
+func (bh *BlankHost) EventBus() event.Bus {
+	return bh.eventbus
 }
