@@ -40,6 +40,8 @@ github.com/libp2p/go-flow-metrics v0.0.1/go.mod h1:Iv1GH0sG8DtYN3SVJ2eG221wMiNpZ
 github.com/libp2p/go-libp2p-core v0.0.4-0.20190619144953-3605e610067d/go.mod h1:j+YQMNz9WNSkNezXOsahp9kwZBKBvxLpKD316QWSJXE=
 github.com/libp2p/go-libp2p-core v0.0.4-0.20190619153849-6957d130826a h1:HplunwYuqZIWM7YxDnJF3hf1sOYESQD0jIglBFBydGI=
 github.com/libp2p/go-libp2p-core v0.0.4-0.20190619153849-6957d130826a/go.mod h1:j+YQMNz9WNSkNezXOsahp9kwZBKBvxLpKD316QWSJXE=
+github.com/libp2p/go-libp2p-core v0.0.4-0.20190619164458-eee9281d0b6b h1:QIUTYk9MMzTQnuUDgKHXLFvx6/HZB1gGY3lQUuxZE1c=
+github.com/libp2p/go-libp2p-core v0.0.4-0.20190619164458-eee9281d0b6b/go.mod h1:j+YQMNz9WNSkNezXOsahp9kwZBKBvxLpKD316QWSJXE=
 github.com/mattn/go-colorable v0.1.1 h1:G1f5SKeVxmagw/IyvzvtZE4Gybcc4Tr1tf7I8z0XgOg=
 github.com/mattn/go-colorable v0.1.1/go.mod h1:FuOcm+DKB9mbwrcAfNl7/TZVBZ6rcnceauSikq3lYCQ=
 github.com/mattn/go-isatty v0.0.5 h1:tHXDdz1cpzGaovsTB+TVB8q90WEokoVmfMqoVcrLUgw=
