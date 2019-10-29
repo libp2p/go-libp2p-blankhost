@@ -146,7 +146,7 @@ func (bh *BlankHost) SetStreamHandlerMatch(pid protocol.ID, m func(string) bool,
 func (bh *BlankHost) newStreamHandler(s network.Stream) {
 	protoID, handle, err := bh.Mux().Negotiate(s)
 	if err != nil {
-		log.Warning("protocol mux failed: %s", err)
+		log.Warn("protocol mux failed: %s", err)
 		s.Close()
 		return
 	}
