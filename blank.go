@@ -2,6 +2,8 @@ package blankhost
 
 import (
 	"context"
+	"errors"
+	"fmt"
 	"io"
 
 	"github.com/libp2p/go-libp2p-core/connmgr"
@@ -11,6 +13,7 @@ import (
 	"github.com/libp2p/go-libp2p-core/peer"
 	"github.com/libp2p/go-libp2p-core/peerstore"
 	"github.com/libp2p/go-libp2p-core/protocol"
+	"github.com/libp2p/go-libp2p-core/record"
 
 	"github.com/libp2p/go-eventbus"
 
@@ -47,7 +50,34 @@ func NewBlankHost(n network.Network) *BlankHost {
 	}
 
 	n.SetStreamHandler(bh.newStreamHandler)
+
+	// persist a signed peer record for self to the peerstore.
+	if err := bh.initSignedRecord(); err != nil {
+		log.Errorf("error creating blank host, err=%s", err)
+		return nil
+	}
+
 	return bh
+}
+
+func (bh *BlankHost) initSignedRecord() error {
+	cab, ok := peerstore.GetCertifiedAddrBook(bh.n.Peerstore())
+	if !ok {
+		log.Error("peerstore does not support signed records")
+		return errors.New("peerstore does not support signed records")
+	}
+	rec := peer.PeerRecordFromAddrInfo(peer.AddrInfo{bh.ID(), bh.Addrs()})
+	ev, err := record.Seal(rec, bh.Peerstore().PrivKey(bh.ID()))
+	if err != nil {
+		log.Errorf("failed to create signed record for self, err=%s", err)
+		return fmt.Errorf("failed to create signed record for self, err=%s", err)
+	}
+	_, err = cab.ConsumePeerRecord(ev, peerstore.PermanentAddrTTL)
+	if err != nil {
+		log.Errorf("failed to persist signed record to peerstore,err=%s", err)
+		return fmt.Errorf("failed to persist signed record for self, err=%s", err)
+	}
+	return err
 }
 
 var _ host.Host = (*BlankHost)(nil)
