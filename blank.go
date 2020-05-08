@@ -33,10 +33,29 @@ type BlankHost struct {
 	}
 }
 
-func NewBlankHost(n network.Network) *BlankHost {
+type config struct {
+	cmgr connmgr.ConnManager
+}
+
+type Option = func(cfg *config)
+
+func WithConnectionManager(cmgr connmgr.ConnManager) Option {
+	return func(cfg *config) {
+		cfg.cmgr = cmgr
+	}
+}
+
+func NewBlankHost(n network.Network, options ...Option) *BlankHost {
+	cfg := config{
+		cmgr: &connmgr.NullConnMgr{},
+	}
+	for _, opt := range options {
+		opt(&cfg)
+	}
+
 	bh := &BlankHost{
 		n:        n,
-		cmgr:     &connmgr.NullConnMgr{},
+		cmgr:     cfg.cmgr,
 		mux:      mstream.NewMultistreamMuxer(),
 		eventbus: eventbus.NewBus(),
 	}
