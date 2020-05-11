@@ -63,6 +63,9 @@ func NewBlankHost(n network.Network, options ...Option) *BlankHost {
 		eventbus: eventbus.NewBus(),
 	}
 
+	// subscribe the connection manager to network notifications (has no effect with NullConnMgr)
+	n.Notify(bh.cmgr.Notifee())
+
 	var err error
 	if bh.emitters.evtLocalProtocolsUpdated, err = bh.eventbus.Emitter(&event.EvtLocalProtocolsUpdated{}); err != nil {
 		return nil
