@@ -15,10 +15,10 @@ import (
 	"github.com/libp2p/go-libp2p-core/protocol"
 	"github.com/libp2p/go-libp2p-core/record"
 
-	"github.com/libp2p/go-eventbus"
+	"github.com/libp2p/go-libp2p/p2p/protocol/identify"
 
 	logging "github.com/ipfs/go-log"
-
+	"github.com/libp2p/go-eventbus"
 	ma "github.com/multiformats/go-multiaddr"
 	mstream "github.com/multiformats/go-multistream"
 )
@@ -34,13 +34,25 @@ type BlankHost struct {
 	emitters struct {
 		evtLocalProtocolsUpdated event.Emitter
 	}
+
+	ids *identify.IDService
 }
 
 type config struct {
 	cmgr connmgr.ConnManager
+	ids  *identify.IDService
 }
 
 type Option = func(cfg *config)
+
+// WithIDService configures blankhost to use the given Identify Service.
+// Note: If this is configured, blankhost will block a `Connect` call
+// till it gets an Identify response on the connection from the remote peer.
+func WithIDService(ids *identify.IDService) Option {
+	return func(cfg *config) {
+		cfg.ids = ids
+	}
+}
 
 func WithConnectionManager(cmgr connmgr.ConnManager) Option {
 	return func(cfg *config) {
@@ -61,6 +73,7 @@ func NewBlankHost(n network.Network, options ...Option) *BlankHost {
 		cmgr:     cfg.cmgr,
 		mux:      mstream.NewMultistreamMuxer(),
 		eventbus: eventbus.NewBus(),
+		ids:      cfg.ids,
 	}
 
 	// subscribe the connection manager to network notifications (has no effect with NullConnMgr)
@@ -127,7 +140,16 @@ func (bh *BlankHost) Connect(ctx context.Context, ai peer.AddrInfo) error {
 		return nil
 	}
 
-	_, err := bh.Network().DialPeer(ctx, ai.ID)
+	c, err := bh.Network().DialPeer(ctx, ai.ID)
+
+	if bh.ids != nil {
+		select {
+		case <-bh.ids.IdentifyWait(c):
+		case <-ctx.Done():
+			return ctx.Err()
+		}
+	}
+
 	return err
 }
 
