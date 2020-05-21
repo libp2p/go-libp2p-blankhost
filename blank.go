@@ -45,15 +45,6 @@ type config struct {
 
 type Option = func(cfg *config)
 
-// WithIDService configures blankhost to use the given Identify Service.
-// Note: If this is configured, blankhost will block a `Connect` call
-// till it gets an Identify response on the connection from the remote peer.
-func WithIDService(ids *identify.IDService) Option {
-	return func(cfg *config) {
-		cfg.ids = ids
-	}
-}
-
 func WithConnectionManager(cmgr connmgr.ConnManager) Option {
 	return func(cfg *config) {
 		cfg.cmgr = cmgr
@@ -93,6 +84,13 @@ func NewBlankHost(n network.Network, options ...Option) *BlankHost {
 	}
 
 	return bh
+}
+
+// SetIdentifyService configures blankhost to use the given Identify Service.
+// Note: If this is configured, blankhost will block a `Connect` call
+// till it gets an Identify response on the connection from the remote peer.
+func (bh *BlankHost) SetIdentifyService(ids *identify.IDService) {
+	bh.ids = ids
 }
 
 func (bh *BlankHost) initSignedRecord() error {
