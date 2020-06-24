@@ -152,7 +152,7 @@ func (bh *BlankHost) NewStream(ctx context.Context, p peer.ID, protos ...protoco
 
 	selected, err := mstream.SelectOneOf(protoStrs, s)
 	if err != nil {
-		s.Close()
+		s.Reset()
 		return nil, err
 	}
 
@@ -199,7 +199,7 @@ func (bh *BlankHost) newStreamHandler(s network.Stream) {
 	protoID, handle, err := bh.Mux().Negotiate(s)
 	if err != nil {
 		log.Infow("protocol negotiation failed", "error", err)
-		s.Close()
+		s.Reset()
 		return
 	}
 
