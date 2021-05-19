@@ -88,7 +88,7 @@ func (bh *BlankHost) initSignedRecord() error {
 		log.Error("peerstore does not support signed records")
 		return errors.New("peerstore does not support signed records")
 	}
-	rec := peer.PeerRecordFromAddrInfo(peer.AddrInfo{bh.ID(), bh.Addrs()})
+	rec := peer.PeerRecordFromAddrInfo(peer.AddrInfo{ID: bh.ID(), Addrs: bh.Addrs()})
 	ev, err := record.Seal(rec, bh.Peerstore().PrivKey(bh.ID()))
 	if err != nil {
 		log.Errorf("failed to create signed record for self, err=%s", err)
