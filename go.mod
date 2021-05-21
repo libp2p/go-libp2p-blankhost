@@ -1,6 +1,6 @@
 module github.com/libp2p/go-libp2p-blankhost
 
-go 1.14
+go 1.15
 
 require (
 	github.com/ipfs/go-log v1.0.4
