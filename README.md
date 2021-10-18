@@ -14,8 +14,6 @@ go-libp2p-blankhost
 ## Table of Contents
 
 - [Install](#install)
-- [Usage](#usage)
-- [API](#api)
 - [Contribute](#contribute)
 - [License](#license)
 
