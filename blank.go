@@ -82,6 +82,10 @@ func NewBlankHost(n network.Network, options ...Option) *BlankHost {
 	return bh
 }
 
+func (bh *BlankHost) Start() {
+	bh.Peerstore().Start(bh.EventBus())
+}
+
 func (bh *BlankHost) initSignedRecord() error {
 	cab, ok := peerstore.GetCertifiedAddrBook(bh.n.Peerstore())
 	if !ok {
@@ -115,6 +119,7 @@ func (bh *BlankHost) Addrs() []ma.Multiaddr {
 }
 
 func (bh *BlankHost) Close() error {
+	bh.n.Peerstore().Close()
 	return bh.n.Close()
 }
 
