@@ -17,7 +17,7 @@ import (
 
 	"github.com/libp2p/go-eventbus"
 
-	logging "github.com/ipfs/go-log"
+	logging "github.com/ipfs/go-log/v2"
 
 	ma "github.com/multiformats/go-multiaddr"
 	mstream "github.com/multiformats/go-multistream"
