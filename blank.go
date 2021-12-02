@@ -37,7 +37,8 @@ type BlankHost struct {
 }
 
 type config struct {
-	cmgr connmgr.ConnManager
+	cmgr     connmgr.ConnManager
+	eventBus event.Bus
 }
 
 type Option = func(cfg *config)
@@ -45,6 +46,12 @@ type Option = func(cfg *config)
 func WithConnectionManager(cmgr connmgr.ConnManager) Option {
 	return func(cfg *config) {
 		cfg.cmgr = cmgr
+	}
+}
+
+func WithEventBus(eventBus event.Bus) Option {
+	return func(cfg *config) {
+		cfg.eventBus = eventBus
 	}
 }
 
@@ -57,10 +64,12 @@ func NewBlankHost(n network.Network, options ...Option) *BlankHost {
 	}
 
 	bh := &BlankHost{
-		n:        n,
-		cmgr:     cfg.cmgr,
-		mux:      mstream.NewMultistreamMuxer(),
-		eventbus: eventbus.NewBus(),
+		n:    n,
+		cmgr: cfg.cmgr,
+		mux:  mstream.NewMultistreamMuxer(),
+	}
+	if bh.eventbus == nil {
+		bh.eventbus = eventbus.NewBus()
 	}
 
 	// subscribe the connection manager to network notifications (has no effect with NullConnMgr)
